@@ -50,6 +50,14 @@ Flow:
 
 When the user wants to go deeper on one item, run capability 1 on it.
 
+## Capability 3: watchlist (explicit, self-cleaning — queries are one-shot, watching is opt-in)
+
+Items in state.json may carry `"watch": true` (+ `"watchedAt"`, `"lastActivityAt"`). Rules:
+
+- **In**: the user's own issues/PRs (author or assignee) are auto-watched; anything else ONLY when the user explicitly says to watch it (e.g. after a 🟢 verdict they say "I'll take this" / "盯着它"). Never auto-watch something merely because it was queried once.
+- **Out (self-cleaning)**: when a watched item goes closed/merged, report that final change once, then remove the watch. If a watched item has had no activity for 30 days, ask once "still watching?" — no answer next run means remove.
+- **Watch run** (triggered by "check my watchlist" / a scheduled job): run capability 2's snapshot diff over watched items only, PLUS capability 1's fetch on any watched item that moved (so the report has substance: who said what, what's needed from the user). **If nothing changed, output exactly "no updates" and nothing else** — silence is the default; only changes earn words.
+
 ## On-demand processing (give what's asked, don't volunteer)
 
 - **"Is anyone working on this / can I take it?"** → verdict 🟢🟡🔴. Hard rules — ANY of these makes it 🔴: has an assignee; timeline shows a linked PR that is open or was closed within 14 days; any claim-style comment in the last 30 days (working on / I'll take / let me); an open linked PR found via search. Claimed 45+ days ago with no follow-up = 🟡 (politely ask, then take over). Only if NONE apply is it 🟢. **Never output a claimability verdict for the user's own issue/PR.**
