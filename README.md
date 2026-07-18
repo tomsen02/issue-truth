@@ -61,18 +61,18 @@ mkdir -p ~/.claude/skills/gh
 curl -o ~/.claude/skills/gh/SKILL.md https://raw.githubusercontent.com/tomsen02/issue-truth/main/skill/SKILL.md
 ```
 
+A Chinese version is available at [`skill/SKILL.zh-CN.md`](skill/SKILL.zh-CN.md) — use its URL in the `curl` above if you prefer Chinese prompts.
+
 Requires the [GitHub CLI](https://cli.github.com/) (`gh`) logged in.
 
 ## Use
 
 ```
 /gh owner/repo#123          # full picture of one issue/PR, evidence-linked
-/gh owner/repo 新消息        # what changed since last check (snapshot diff)
+/gh owner/repo news         # what changed since last check (snapshot diff)
 ```
 
-Or just ask naturally: "is anyone working on owner/repo#123?" — the claimability verdict (🟢/🟡/🔴) is applied on top of the same full fetch.
-
-The skill's prompt is currently written in Chinese; the commands and output structure are language-independent, and Claude will respond in your language. PRs translating it are welcome.
+Or just ask naturally: "is anyone working on owner/repo#123?" — the claimability verdict (🟢/🟡/🔴) is applied on top of the same full fetch. Claude replies in whatever language you're chatting in.
 
 ## License
 
