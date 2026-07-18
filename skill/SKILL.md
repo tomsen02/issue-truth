@@ -58,6 +58,25 @@ Items in state.json may carry `"watch": true` (+ `"watchedAt"`, `"lastActivityAt
 - **Out (self-cleaning)**: when a watched item goes closed/merged, report that final change once, then remove the watch. If a watched item has had no activity for 30 days, ask once "still watching?" — no answer next run means remove.
 - **Watch run** (triggered by "check my watchlist" / a scheduled job): run capability 2's snapshot diff over watched items only, PLUS capability 1's fetch on any watched item that moved (so the report has substance: who said what, what's needed from the user). **If nothing changed, output exactly "no updates" and nothing else** — silence is the default; only changes earn words.
 
+## Capability 4: my open work, grouped by project ("盘点" / "what's blocked?")
+
+Inventory everything the user has open across GitHub, with a blocker verdict per item:
+
+```bash
+gh search prs   --author=@me --state=open --json repository,number,title,updatedAt,isDraft
+gh search issues --author=@me --state=open --json repository,number,title,updatedAt
+# also include items where the user is assignee: --assignee=@me
+```
+
+Then for each PR run the capability-1 style view (`reviewDecision,statusCheckRollup,mergeable,reviews,comments`) and decide **whose court the ball is in**, by hard rules:
+
+- CI failing, merge conflict, or reviewDecision CHANGES_REQUESTED → **blocked on the user** (say exactly what to do)
+- last comment/review is from someone else and unanswered → **blocked on the user** (reply needed)
+- user spoke last / review requested but none given → **blocked on them** (note how long; suggest a ping if >7 days)
+- for issues: same last-speaker rule; no maintainer response at all → note the age
+
+Output grouped by repo, two buckets first: **needs your action** (with the concrete next step) then **waiting on them** (with wait time). Every line links. End with the fetch-coverage list.
+
 ## On-demand processing (give what's asked, don't volunteer)
 
 - **"Is anyone working on this / can I take it?"** → verdict 🟢🟡🔴. Hard rules — ANY of these makes it 🔴: has an assignee; timeline shows a linked PR that is open or was closed within 14 days; any claim-style comment in the last 30 days (working on / I'll take / let me); an open linked PR found via search. Claimed 45+ days ago with no follow-up = 🟡 (politely ask, then take over). Only if NONE apply is it 🟢. **Never output a claimability verdict for the user's own issue/PR.**
