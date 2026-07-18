@@ -75,7 +75,7 @@ Then for each PR run the capability-1 style view (`reviewDecision,statusCheckRol
 - user spoke last / review requested but none given → **blocked on them** (note how long; suggest a ping if >7 days)
 - for issues: same last-speaker rule; no maintainer response at all → note the age
 
-Output grouped by repo, two buckets first: **needs your action** (with the concrete next step) then **waiting on them** (with wait time). Every line links. End with the fetch-coverage list.
+Output as two markdown tables: **needs your action** (columns: repo | item(linked) | status | blocker | next step) then **waiting on them** (columns: repo | item(linked) | status | whose court | waiting for). Companion issues that will auto-close with a PR can be folded into one row. End with the fetch-coverage list.
 
 ## On-demand processing (give what's asked, don't volunteer)
 
