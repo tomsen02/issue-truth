@@ -7,6 +7,13 @@ description: See GitHub reliably. (1) Fetch the COMPLETE picture of an issue/PR 
 
 Two capabilities: **fetch-complete** (dig one issue/PR to the bottom) and **memory** (snapshot diff to report changes). Verdicts and filtering are just processing layered on top — provide them only when asked.
 
+## The table is the heart: always maintain state.json
+
+`~/.claude/skills/gh/state.json` is this skill's single memory. **Every invocation of any capability ends by writing back what it just learned**: fetched an issue → upsert its entry (state, comments count, assignees, updatedAt, lastSeenAt); ran the inventory → refresh all own items; an item turned closed/merged → record it. Reads are cheap, a stale table is expensive — never skip the write-back. Roles of the fields:
+
+- The **list of the user's own items** is NOT maintained by hand — it is re-discovered live each time via `gh search --author=@me` (auto-in for new, auto-out for closed). The table only remembers what each item looked like last time (for diffs and ball-in-court flips).
+- `"watch": true` marks the ONLY hand-curated thing: items belonging to OTHERS that the user explicitly asked to follow. Never auto-watch; self-clean per capability 3.
+
 ## Capability 1: fetch-complete for a single issue/PR
 
 Mandatory fetch checklist. Never skip a path because "it looks like enough":
